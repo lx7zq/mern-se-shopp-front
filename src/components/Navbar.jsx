@@ -12,19 +12,19 @@ const Navbar = () => {
           <summary>Category</summary>
           <ul>
             <li>
-              <a href="">All</a>
+              <a href="/shop">All</a>
             </li>
             <li>
-              <a href="">Clothing</a>
+              <a href="/shop?Clothing">Clothing</a>
             </li>
             <li>
-              <a href="">Accessoires</a>
+              <a href="/shop?Accessoires">Accessoires</a>
             </li>
             <li>
-              <a href="">Gadgets</a>
+              <a href="/shop?Gadgets">Gadgets</a>
             </li>
             <li>
-              <a href="">Swag</a>
+              <a href="/shop?Swag">Swag</a>
             </li>
           </ul>
         </details>

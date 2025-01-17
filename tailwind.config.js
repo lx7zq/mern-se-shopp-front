@@ -4,8 +4,12 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      red: "#830109",
-      secondary: "#555",
+      colors: {
+        red: "#830109",
+        secondary: "#555",
+        primary: "#555",
+        primaryBG: "#f8f8f8",
+      },
     },
   },
   plugins: [daisyui],

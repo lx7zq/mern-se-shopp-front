@@ -10,35 +10,35 @@ const ProductItem = ({ image, name, price, rating }) => {
         <div className="rating rating-sm">
           <input
             type="radio"
-            name="rating-3"
+            name={name}
             className="mask mask-heart bg-red-400"
             defaultChecked={rating == 1 ? true : false}
             disabled
           />
           <input
             type="radio"
-            name="rating-3"
+            name={name}
             className="mask mask-heart bg-orange-400"
             defaultChecked={rating == 2 ? true : false}
             disabled
           />
           <input
             type="radio"
-            name="rating-3"
+            name={name}
             className="mask mask-heart bg-yellow-400"
             defaultChecked={rating == 3 ? true : false}
             disabled
           />
           <input
             type="radio"
-            name="rating-3"
+            name={name}
             className="mask mask-heart bg-lime-400"
             defaultChecked={rating == 4 ? true : false}
             disabled
           />
           <input
             type="radio"
-            name="rating-3"
+            name={name}
             className="mask mask-heart bg-green-400"
             defaultChecked={rating == 5 ? true : false}
             disabled
