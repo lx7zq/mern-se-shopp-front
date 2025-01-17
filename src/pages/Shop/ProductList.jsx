@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProductService from "../../services/product.service";
 import Card from "../../components/Card";
+import { useSearchParams } from "react-router";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -8,19 +9,28 @@ const ProductList = () => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [sortOption, setSortOption] = useState("default");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [itemsPerPage, setItemsPerPage] = useState(8);
   const [currentPage, setCurrentPage] = useState(1);
+  const categoryQuery = searchParams.get("category") || "all";
+  const itemPerPageQuery = searchParams.get("itemPerPage") || 4;
 
+  useEffect(() => {
+    setSelectedCategory(categoryQuery);
+    setItemsPerPage(itemPerPageQuery);
+  }, [categoryQuery, itemPerPageQuery]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await ProductService.getAllProducts();
+        console.log(response.data); // เพิ่มการ log ข้อมูล response
         setProducts(response.data);
         setCategories([
           "all",
           ...new Set(response.data.map((item) => item.category)),
         ]);
         setFilteredItems(response.data);
+        setSearchParams({ category: category });
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }

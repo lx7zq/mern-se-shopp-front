@@ -50,9 +50,12 @@ const service = () => {
         <div className="md:w-1/2">
           <div className="grid sm:grid-cols-2 grid-cols-1 gap-8 item-center">
             {myServices.length > 0 &&
-              myServices.map((item) => {
+              myServices.map((item, index) => {
                 return (
-                  <div className="shadow-md rounded-sm  py-5 px-4 text-center space-y-2 text-red cursor-pointer hover:border hover border-indigo-600 transition-all duration-200">
+                  <div
+                    key={index}
+                    className="shadow-md rounded-sm  py-5 px-4 text-center space-y-2 text-red cursor-pointer hover:border hover border-indigo-600 transition-all duration-200"
+                  >
                     <img src={item.image} alt="" className="mx-auto h-16" />
                     <h5 className="font-semibold">{item.title}</h5>
                     <p className="text-[#907E7E]]">{item.description}</p>

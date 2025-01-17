@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import productList from "./product.json";
+import ProductService from "../../services/product.service";
 import Card from "../../components/Card";
 
 const SampleNextArrow = (prop) => {
@@ -30,7 +30,7 @@ const SamplePrevArrow = (prop) => {
   );
 };
 const Product = () => {
-  const [products, SetProduct] = useState(productList);
+  const [products, setProduct] = useState([]);
   const slider = useRef(null);
   const settings = {
     dots: true,
@@ -68,6 +68,19 @@ const Product = () => {
       },
     ],
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await ProductService.getAllProducts();
+        const data = response.data;
+        const special = data.filter((item) => item.category === "gadget");
+        setProduct(special);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+    fetchData();
+  }, []);
   return (
     <div className="section-container my-20 relative">
       <div className="text-left">

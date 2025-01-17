@@ -15,16 +15,16 @@ const Navbar = () => {
               <a href="/shop">All</a>
             </li>
             <li>
-              <a href="/shop?Clothing">Clothing</a>
+              <a href="/shop?category=clothing">Clothing</a>
             </li>
             <li>
-              <a href="/shop?Accessoires">Accessoires</a>
+              <a href="/shop?category=accessoires">Accessoires</a>
             </li>
             <li>
-              <a href="/shop?Gadgets">Gadgets</a>
+              <a href="/shop?category=gadgets">Gadgets</a>
             </li>
             <li>
-              <a href="/shop?Swag">Swag</a>
+              <a href="/shop?category=swag">Swag</a>
             </li>
           </ul>
         </details>
