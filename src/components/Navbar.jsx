@@ -3,10 +3,12 @@ import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 // import UserIcon from "./icons/UserIcon";
 import Modal from "./Modal";
+import useCart from "../hook/useCart";
 import { FaUserCircle } from "react-icons/fa";
 
 const Navbar = () => {
   const { user } = useContext(AuthContext);
+  const [cart, refetch] = useCart();
   const navItems = (
     <>
       <li>

@@ -1,10 +1,55 @@
 import React, { useState } from "react";
+import cartService from "../services/cart.service";
+import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
+import useCart from "../hook/useCart";
+import Swal from "sweetalert2";
 
 const Card = ({ item }) => {
   const { _id, name, image, description, category, price } = item;
+  const { user } = useContext(AuthContext);
+  const [cart, refetch] = useCart();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const handleHeartClick = () => {
     setIsHeartFilled(!isHeartFilled);
+  };
+  const handleAddToCart = async () => {
+    if (!user || !user.email) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please login to add to cart",
+      });
+      return;
+    }
+
+    try {
+      const cartItem = {
+        productId: _id,
+        email: user.email,
+        quantity: 1,
+        name,
+        price,
+        image,
+      };
+      const response = await cartService.addToCart(cartItem);
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Item added to cart",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+        refetch();
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message,
+      });
+    }
   };
   return (
     <div className="card shadow-xl relative mr-5 md:my-5 h-120">
@@ -32,7 +77,9 @@ const Card = ({ item }) => {
           <h5 className="font-bold">
             {price} <span className="text-sm text-red">฿</span>
           </h5>
-          <button className="btn bg-red text-white">Add to card</button>
+          <button className="btn bg-red text-white" onClick={handleAddToCart}>
+            Add to cart
+          </button>
         </div>
       </div>
     </div>
