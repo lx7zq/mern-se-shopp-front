@@ -17,6 +17,7 @@ import {
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const auth = getAuth(app);
   // const googleProvider = new GoogleAuthProvider();
   // const githubProvider = new GithubAuthProvider();
@@ -70,6 +71,7 @@ const AuthProvider = ({ children }) => {
     signUpWithFacebook,
     updateUserProfile,
     // linkAccount,
+    isLoading,
   };
   //check if user is logged in
   useEffect(() => {
@@ -77,7 +79,9 @@ const AuthProvider = ({ children }) => {
       setUser(currentUser);
       if (currentUser) {
         setUser(currentUser);
+        setIsLoading(false);
       }
+      setIsLoading(false);
     });
     return () => {
       return unsubscribe();

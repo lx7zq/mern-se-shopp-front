@@ -3,12 +3,17 @@ import useCart from "../../hook/useCart";
 import { FaTrashCan } from "react-icons/fa6";
 import { AuthContext } from "../../context/AuthContext";
 import cartService from "../../services/cart.service";
-
 import Swal from "sweetalert2";
 
 const Index = () => {
   const [cart, refetch] = useCart();
   const { user } = useContext(AuthContext);
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("th-TH", {
+      style: "currency",
+      currency: "THB",
+    }).format(price);
+  };
   const handleClearCart = async () => {
     Swal.fire({
       icon: "question",
@@ -72,8 +77,46 @@ const Index = () => {
     });
   };
 
-  const handleIncrease = async () => {};
-  const handleDecrease = async () => {};
+  const handleIncrease = async (cartItem) => {
+    try {
+      const response = await cartService.updateCart(cartItem._id, {
+        quantity: cartItem.quantity + 1,
+      });
+
+      if (response.status === 200) {
+        refetch(); // รีเฟรชข้อมูล
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+      });
+    }
+  };
+
+  const handleDecrease = async (cartItem) => {
+    try {
+      const response = await cartService.updateCart(cartItem._id, {
+        quantity: cartItem.quantity - 1,
+      });
+
+      if (response.status === 200) {
+        refetch(); // รีเฟรชข้อมูล
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+      });
+    }
+  };
+  // const totalprice = (items) => {
+  //   let total = 0;
+  //   items.forEach(items);
+  // };
+
   return (
     <div className="overflow-x-auto">
       <table className="table">
@@ -118,16 +161,22 @@ const Index = () => {
                   </div>
                 </td>
                 <div className="flex items-center">
-                  <button className="btn btn-xs" onClick={handleDecrease}>
+                  <button
+                    className="btn btn-xs"
+                    onClick={() => handleDecrease(cartItem)}
+                  >
                     -
                   </button>
                   <span className="mx-2">{cartItem.quantity}</span>
-                  <button className="btn btn-xs" onClick={handleIncrease}>
+                  <button
+                    className="btn btn-xs"
+                    onClick={() => handleIncrease(cartItem)}
+                  >
                     +
                   </button>
                 </div>
-                <td>${cartItem.price}</td>
-                <td>${cartItem.quantity * cartItem.price}</td>
+                <td>{formatPrice(cartItem.price)}</td>
+                <td>{formatPrice(cartItem.quantity * cartItem.price)}</td>
                 <button onClick={() => handleDeleteItem(cartItem)}>
                   <FaTrashCan />
                 </button>
