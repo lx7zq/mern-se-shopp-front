@@ -9,6 +9,10 @@ import Setting from "../pages/Setting/Index";
 // import Profile from "../pages/Profile/Index";
 import { MyProfile } from "../pages/Profile/MyProfile";
 import ProtectPage from "../pages/ProtectPage/index";
+import DashboardLayout from "../layouts/DashboardLayout";
+import Dashboard from "../pages/Dashboard/index";
+import AddProduct from "../pages/AddProduct/index";
+import ManageItems from "../pages/Manage-items";
 
 const router = createBrowserRouter([
   {
@@ -47,9 +51,27 @@ const router = createBrowserRouter([
         path: "/profile",
         element: (
           <ProtectPage>
-            <MyProfile />,
+            <MyProfile />
           </ProtectPage>
         ),
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "",
+        element: <Dashboard />,
+      },
+      {
+        path: "add-product",
+        element: <AddProduct />,
+      },
+      {
+        path: "Manage-Items",
+        element: <ManageItems />,
       },
     ],
   },

@@ -79,47 +79,62 @@ const Index = () => {
 
   const handleIncrease = async (cartItem) => {
     try {
+      if (!cartItem || !cartItem._id) return;
+
       const response = await cartService.updateCart(cartItem._id, {
         quantity: cartItem.quantity + 1,
       });
 
       if (response.status === 200) {
-        refetch(); // รีเฟรชข้อมูล
+        refetch(); // รีโหลดตะกร้า
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.message,
+        text: error.response?.data?.message || "Failed to update cart",
       });
     }
   };
 
   const handleDecrease = async (cartItem) => {
     try {
+      if (!cartItem || !cartItem._id) return;
+
+      // ป้องกันจำนวนติดลบ
+      if (cartItem.quantity <= 1) {
+        Swal.fire({
+          icon: "warning",
+          title: "Cannot Decrease",
+          text: "Quantity cannot be less than 1",
+        });
+        return;
+      }
+
       const response = await cartService.updateCart(cartItem._id, {
         quantity: cartItem.quantity - 1,
       });
 
       if (response.status === 200) {
-        refetch(); // รีเฟรชข้อมูล
+        refetch();
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.message,
+        text: error.response?.data?.message || "Failed to update cart",
       });
     }
   };
+
   // const totalprice = (items) => {
   //   let total = 0;
   //   items.forEach(items);
   // };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="table">
+    <div className="overflow-x-auto max-w-screen-md mx-auto">
+      <table className="table table-compact w-full">
         {/* head */}
         <thead>
           <tr className="bg-red font-semibold text-white">
@@ -162,19 +177,20 @@ const Index = () => {
                 </td>
                 <div className="flex items-center">
                   <button
-                    className="btn btn-xs"
+                    className="btn btn-xs btn-outline btn-primary"
                     onClick={() => handleDecrease(cartItem)}
                   >
                     -
                   </button>
                   <span className="mx-2">{cartItem.quantity}</span>
                   <button
-                    className="btn btn-xs"
+                    className="btn btn-xs btn-outline btn-primary"
                     onClick={() => handleIncrease(cartItem)}
                   >
                     +
                   </button>
                 </div>
+
                 <td>{formatPrice(cartItem.price)}</td>
                 <td>{formatPrice(cartItem.quantity * cartItem.price)}</td>
                 <button onClick={() => handleDeleteItem(cartItem)}>
