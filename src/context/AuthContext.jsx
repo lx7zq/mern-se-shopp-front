@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-export const AuthContext = createContext();
+import { Cookies } from "react-cookie";
 import app from "../configs/firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -12,57 +12,85 @@ import {
   GithubAuthProvider,
   FacebookAuthProvider,
   updateProfile,
-  // linkWithPopup,
 } from "firebase/auth";
+import UserService from "../services/user.service";
+
+const cookies = new Cookies();
+export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const auth = getAuth(app);
-  // const googleProvider = new GoogleAuthProvider();
-  // const githubProvider = new GithubAuthProvider();
+
+  const getUser = () => {
+    const userInfo = cookies.get("user") || null;
+    return userInfo;
+  };
 
   const createUser = (email, password) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
+
   const login = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
+
   const logout = () => {
+    cookies.remove("token");
     return signOut(auth);
   };
+
   const signUpWithGoogle = () => {
     const provider = new GoogleAuthProvider();
     return signInWithPopup(auth, provider);
   };
+
   const signUpWithGithub = () => {
     const provider = new GithubAuthProvider();
     return signInWithPopup(auth, provider);
   };
+
   const signUpWithFacebook = () => {
     const provider = new FacebookAuthProvider();
     return signInWithPopup(auth, provider);
   };
+
   const updateUserProfile = ({ name, photoURL }) => {
     return updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photoURL,
     });
   };
-  // const linkAccount = (currentUser) => {
-  //   linkWithPopup(currentUser, googleProvider)
-  //     .then((result) => {
-  //       const credential = GoogleAuthProvider.credentialFromResult(result);
-  //       console.log(credential);
-  //       const user = result.user;
-  //       console.log(user);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      if (currentUser) {
+        try {
+          const { email } = currentUser;
+          const response = await UserService.signJwt(email);
+
+          if (response.data) {
+            cookies.set("user", response.data);
+          }
+        } catch (error) {
+          console.error("Error signing JWT:", error);
+        }
+      } else {
+        cookies.remove("user");
+      }
+
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
+
   const authInfo = {
     user,
+    getUser,
     createUser,
     login,
     logout,
@@ -70,26 +98,12 @@ const AuthProvider = ({ children }) => {
     signUpWithGithub,
     signUpWithFacebook,
     updateUserProfile,
-    // linkAccount,
     isLoading,
   };
-  //check if user is logged in
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        setUser(currentUser);
-        setIsLoading(false);
-      }
-      setIsLoading(false);
-    });
-    return () => {
-      return unsubscribe();
-    };
-  }, [auth]);
 
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
   );
 };
+
 export default AuthProvider;

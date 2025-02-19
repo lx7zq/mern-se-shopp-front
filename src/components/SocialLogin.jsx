@@ -4,6 +4,7 @@ import { FaGithub } from "react-icons/fa";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import { useNavigate, useLocation } from "react-router";
+import UserService from "../services/user.service";
 
 const SocialLogin = () => {
   const { signUpWithGoogle, signUpWithGithub, signUpWithFacebook } =
@@ -13,9 +14,11 @@ const SocialLogin = () => {
   const from = location?.state?.from?.pathname || "/";
   const googleSignUp = () => {
     signUpWithGoogle()
-      .then((result) => {
+      .then(async (result) => {
         const user = result.user;
         console.log(user);
+        //Sign up to loacl backend
+        await UserService.addUser(user.email);
         Swal.fire({
           icon: "success",
           title: "Google Sign Up Successfully",
@@ -32,9 +35,11 @@ const SocialLogin = () => {
   const githubSignUp = () => {
     let user;
     signUpWithGithub()
-      .then((result) => {
+      .then(async (result) => {
         user = result.user;
         console.log(user);
+        //Sign up to loacl backend
+        await UserService.addUser(user.email);
         Swal.fire({
           icon: "success",
           title: "GitHub Sign Up Successfully",
@@ -51,9 +56,11 @@ const SocialLogin = () => {
   const facebookSignUp = () => {
     let user;
     signUpWithFacebook()
-      .then((result) => {
+      .then(async (result) => {
         user = result.user;
         console.log(user);
+        //Sign up to loacl backend
+        await UserService.addUser(user.email);
         Swal.fire({
           icon: "success",
           title: "Facebook Sign Up Successfully",
