@@ -13,6 +13,8 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Dashboard from "../pages/Dashboard/index";
 import AddProduct from "../pages/AddProduct/index";
 import ManageItems from "../pages/Manage-items";
+import ManageUser from "../pages/Manage-user";
+import CheckOutSuccess from "../pages/CheckOut-success";
 
 const router = createBrowserRouter([
   {
@@ -28,12 +30,12 @@ const router = createBrowserRouter([
         element: <Shop />,
       },
       {
+        path: "/checkout-success",
+        element: <CheckOutSuccess />,
+      },
+      {
         path: "/cart",
-        element: (
-          <ProtectPage>
-            <Cart />
-          </ProtectPage>
-        ),
+        element: <Cart />,
       },
       {
         path: "/signup",
@@ -49,11 +51,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: (
-          <ProtectPage>
-            <MyProfile />
-          </ProtectPage>
-        ),
+        element: <MyProfile />,
       },
     ],
   },
@@ -72,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: "Manage-Items",
         element: <ManageItems />,
+      },
+      {
+        path: "Manage-User",
+        element: <ManageUser />,
       },
     ],
   },

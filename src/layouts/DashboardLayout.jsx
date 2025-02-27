@@ -76,7 +76,7 @@ const DashboardLayout = () => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard/users">
+              <Link to="/dashboard/Manage-User">
                 <FaUser /> All Users
               </Link>
             </li>

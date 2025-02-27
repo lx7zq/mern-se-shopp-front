@@ -4,6 +4,7 @@ import { FaTrashCan } from "react-icons/fa6";
 import { AuthContext } from "../../context/AuthContext";
 import cartService from "../../services/cart.service";
 import Swal from "sweetalert2";
+import PaymentButton from "../../components/PaymentButton";
 
 const Index = () => {
   const [cart, refetch] = useCart();
@@ -14,37 +15,37 @@ const Index = () => {
       currency: "THB",
     }).format(price);
   };
-  const handleClearCart = async () => {
-    Swal.fire({
-      icon: "question",
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      cancelButtonColor: "#d33",
-      confirmButtonColor: "#3085d6",
-      showConfirmButton: true,
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await cartService.clearCart(user?.email);
-          if (response.status === 200) {
-            refetch();
-            Swal.fire({
-              icon: "success",
-              title: "Delete Success",
-              text: response.message,
-            });
-          }
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: error.message,
-          });
-        }
-      }
-    });
-  };
+  // const handleClearCart = async () => {
+  //   Swal.fire({
+  //     icon: "question",
+  //     title: "Are you sure?",
+  //     text: "You won't be able to revert this!",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonColor: "#3085d6",
+  //     showConfirmButton: true,
+  //     confirmButtonText: "Yes, delete it!",
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         const response = await cartService.clearCart(user?.email);
+  //         if (response.status === 200) {
+  //           refetch();
+  //           Swal.fire({
+  //             icon: "success",
+  //             title: "Delete Success",
+  //             text: response.message,
+  //           });
+  //         }
+  //       } catch (error) {
+  //         Swal.fire({
+  //           icon: "error",
+  //           title: "Error",
+  //           text: error.message,
+  //         });
+  //       }
+  //     }
+  //   });
+  // };
   const handleDeleteItem = async (cartItem) => {
     Swal.fire({
       icon: "question",
@@ -127,15 +128,18 @@ const Index = () => {
     }
   };
 
-  // const totalprice = (items) => {
-  //   let total = 0;
-  //   items.forEach(items);
-  // };
+  const totalPrice = (cart) => {
+    let total = 0;
+    for (let i = 0; i < cart.length; i++) {
+      total += cart[i].price * cart[i].quantity;
+    }
+    return total;
+  };
 
   return (
     <div className="overflow-x-auto max-w-screen-md mx-auto">
       <table className="table table-compact w-full">
-        {/* head */}
+        {/* Table Head */}
         <thead>
           <tr className="bg-red font-semibold text-white">
             <th>#</th>
@@ -147,8 +151,9 @@ const Index = () => {
             <th>Action</th>
           </tr>
         </thead>
+
+        {/* Table Body */}
         <tbody>
-          {/* row 1 */}
           {cart.length > 0 &&
             cart.map((cartItem, index) => (
               <tr key={cartItem.id || index}>
@@ -163,7 +168,7 @@ const Index = () => {
                             cartItem.image ||
                             "https://img.daisyui.com/images/profile/demo/2@94.webp"
                           }
-                          alt="Avatar Tailwind CSS Component"
+                          alt="Product"
                         />
                       </div>
                     </div>
@@ -175,31 +180,35 @@ const Index = () => {
                     </div>
                   </div>
                 </td>
-                <div className="flex items-center">
-                  <button
-                    className="btn btn-xs btn-outline btn-primary"
-                    onClick={() => handleDecrease(cartItem)}
-                  >
-                    -
-                  </button>
-                  <span className="mx-2">{cartItem.quantity}</span>
-                  <button
-                    className="btn btn-xs btn-outline btn-primary"
-                    onClick={() => handleIncrease(cartItem)}
-                  >
-                    +
-                  </button>
-                </div>
-
+                <td>
+                  <div className="flex items-center">
+                    <button
+                      className="btn btn-xs btn-outline btn-primary"
+                      onClick={() => handleDecrease(cartItem)}
+                    >
+                      -
+                    </button>
+                    <span className="mx-2">{cartItem.quantity}</span>
+                    <button
+                      className="btn btn-xs btn-outline btn-primary"
+                      onClick={() => handleIncrease(cartItem)}
+                    >
+                      +
+                    </button>
+                  </div>
+                </td>
                 <td>{formatPrice(cartItem.price)}</td>
                 <td>{formatPrice(cartItem.quantity * cartItem.price)}</td>
-                <button onClick={() => handleDeleteItem(cartItem)}>
-                  <FaTrashCan />
-                </button>
+                <td>
+                  <button onClick={() => handleDeleteItem(cartItem)}>
+                    <FaTrashCan />
+                  </button>
+                </td>
               </tr>
             ))}
         </tbody>
-        {/* foot */}
+
+        {/* Table Foot */}
         <tfoot>
           <tr>
             <th></th>
@@ -212,6 +221,33 @@ const Index = () => {
           </tr>
         </tfoot>
       </table>
+
+      {/* Shopping Summary */}
+      {cart.length > 0 ? (
+        <div className="overflow-x-auto">
+          <hr />
+          <div className="flex flex-col md:flex-row justify-between items-start my-12 gap-8">
+            <div className="md:w-1/2 space-y-3">
+              <h3 className="text-lg font-semibold">Customer Details</h3>
+              <p>Name: {user?.displayName}</p>
+              <p>Email: {user?.email}</p>
+              <p>User ID: {user?.uid}</p>
+            </div>
+            <div className="md:w-1/2 space-y-3">
+              <h3 className="text-lg font-semibold">Shopping Details</h3>
+              <p>Total Items: {cart.length} items</p>
+              <p>Total Price: {formatPrice(totalPrice(cart))}</p>
+              <PaymentButton cartItems={cart} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="text-2xl font-bold text-center text-red mb-4">
+            No items in cart
+          </div>
+        </div>
+      )}
     </div>
   );
 };
