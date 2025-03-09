@@ -1,5 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Cookies } from "react-cookie";
+export const AuthContext = createContext();
 import app from "../configs/firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -7,8 +8,8 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  GoogleAuthProvider,
   signInWithPopup,
+  GoogleAuthProvider,
   GithubAuthProvider,
   FacebookAuthProvider,
   updateProfile,
@@ -16,18 +17,16 @@ import {
 import UserService from "../services/user.service";
 
 const cookies = new Cookies();
-export const AuthContext = createContext();
+
+const getUser = () => {
+  const userInfo = cookies.get("user") || null;
+  return userInfo;
+};
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const auth = getAuth(app);
-
-  const getUser = () => {
-    const userInfo = cookies.get("user") || null;
-    return userInfo;
-  };
-
   const createUser = (email, password) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
@@ -37,7 +36,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    cookies.remove("token");
     return signOut(auth);
   };
 
@@ -63,34 +61,9 @@ const AuthProvider = ({ children }) => {
     });
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-
-      if (currentUser) {
-        try {
-          const { email } = currentUser;
-          const response = await UserService.signJwt(email);
-
-          if (response.data) {
-            cookies.set("user", response.data);
-          }
-        } catch (error) {
-          console.error("Error signing JWT:", error);
-        }
-      } else {
-        cookies.remove("user");
-      }
-
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [auth]);
-
   const authInfo = {
     user,
-    getUser,
+    isLoading,
     createUser,
     login,
     logout,
@@ -98,8 +71,31 @@ const AuthProvider = ({ children }) => {
     signUpWithGithub,
     signUpWithFacebook,
     updateUserProfile,
-    isLoading,
+    getUser,
   };
+
+  //check if user is logged in
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+        setIsLoading(false);
+        const { email } = currentUser;
+        const response = await UserService.signJwt(email);
+        if (response.data) {
+          console.log(response.data);
+          cookies.set("user", response.data);
+        }
+      } else {
+        cookies.remove("user");
+      }
+      setIsLoading(false);
+    });
+    return () => {
+      return unsubscribe();
+    };
+  }, [auth]);
 
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>

@@ -7,6 +7,7 @@ const ManageItems = () => {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null); // สำหรับเก็บสินค้าที่จะทำการแก้ไข
   const [isModalOpen, setIsModalOpen] = useState(false); // สำหรับเปิด/ปิด Modal
+  const [imageFile, setImageFile] = useState(null); // สำหรับเก็บไฟล์รูปภาพที่อัปโหลด
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -32,11 +33,19 @@ const ManageItems = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedItem(null); // รีเซ็ตข้อมูลสินค้า
+    setImageFile(null); // รีเซ็ตไฟล์รูปภาพ
   };
 
   // Handle save edit
   const handleSaveEdit = async () => {
     try {
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        const uploadResponse = await ProductService.uploadImage(formData);
+        selectedItem.image = uploadResponse.data.imageUrl;
+      }
+
       await ProductService.updateProduct(selectedItem._id, selectedItem); // เรียกใช้ API สำหรับอัพเดตสินค้า
       setItems(
         items.map((item) =>
@@ -195,6 +204,16 @@ const ManageItems = () => {
                 onChange={(e) =>
                   setSelectedItem({ ...selectedItem, price: e.target.value })
                 }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Image
+              </label>
+              <input
+                type="file"
+                onChange={(e) => setImageFile(e.target.files[0])}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               />
             </div>

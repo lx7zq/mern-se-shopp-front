@@ -61,7 +61,7 @@ const DashboardLayout = () => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard/orders">
+              <Link to="/dashboard/Manage-Orders">
                 <FaBox /> Manage Orders
               </Link>
             </li>

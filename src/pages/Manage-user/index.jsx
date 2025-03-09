@@ -1,56 +1,55 @@
-import { useState, useEffect } from "react";
-import UserService from "../../services/user.service"; // ตรวจสอบให้แน่ใจว่าเส้นทางถูกต้อง
+import { useEffect, useState } from "react";
+import UserService from "../../services/user.service";
+import Swal from "sweetalert2";
 
 const Index = () => {
   const [users, setUsers] = useState([]);
 
-  // ดึงข้อมูลผู้ใช้เมื่อ component โหลด
   useEffect(() => {
-    // const fetchUsers = async () => {
-    //   try {
-    //     const response = await UserService.getAllUser();
-    //     if (response.status === 200) {
-    //       setUsers(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching users:", error);
-    //   }
-    // };
-    // fetchUsers();
-    UserService.getAllUser().then((res) => {
-      setUsers(res.data);
-    });
+    fetchUsers();
   }, []);
 
-  const changeRole = (email) => {
-    UserService.getRoleByEmail(email).then((res) => {
-      const role = res.data.role;
-      if (role === "admin") {
-        UserService.makeUser(email).then(() => {
-          setUsers(
-            users.map((user) => {
-              if (user.email === email) {
-                user.role = "user";
-              }
-              return user;
-            })
-          );
-        });
+  const fetchUsers = async () => {
+    try {
+      const response = await UserService.getAllUser();
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const handleToggleRole = async (email, currentRole) => {
+    try {
+      if (currentRole === "user") {
+        await UserService.makeAdmin(email);
       } else {
-        if (role === "admin") {
-          UserService.makeAdmin(email).then(() => {
-            setUsers(
-              users.map((user) => {
-                if (user.email === email) {
-                  user.role = "admin";
-                }
-                return user;
-              })
-            );
-          });
-        }
+        await UserService.makeUser(email);
       }
-    });
+
+      // อัปเดต UI โดยเปลี่ยน role ใน state
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.email === email
+            ? { ...user, role: currentRole === "user" ? "admin" : "user" }
+            : user
+        )
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: `Role updated successfully!`,
+        text: `${email} is now a ${currentRole === "user" ? "Admin" : "User"}.`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error updating role:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to update role",
+        text: error.response?.data?.message || "Something went wrong.",
+      });
+    }
   };
 
   return (
@@ -87,7 +86,10 @@ const Index = () => {
                         <input
                           type="checkbox"
                           className="toggle toggle-primary"
-                          onClick={changeRole}
+                          checked={user.role === "admin"}
+                          onChange={() =>
+                            handleToggleRole(user.email, user.role)
+                          }
                         />
                       </label>
                       <span className="text-sm text-gray-600">Admin</span>

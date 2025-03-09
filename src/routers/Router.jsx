@@ -15,7 +15,8 @@ import AddProduct from "../pages/AddProduct/index";
 import ManageItems from "../pages/Manage-items";
 import ManageUser from "../pages/Manage-user";
 import CheckOutSuccess from "../pages/CheckOut-success";
-
+import AdminRoute from "../ProtectedRoutes/AdminRoute";
+import ManageOrders from "../pages/Manage-order/index";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -35,7 +36,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/cart",
-        element: <Cart />,
+        element: (
+          <ProtectPage>
+            <Cart />
+          </ProtectPage>
+        ),
       },
       {
         path: "/signup",
@@ -47,17 +52,29 @@ const router = createBrowserRouter([
       },
       {
         path: "/update-profile",
-        element: <Setting />,
+        element: (
+          <ProtectPage>
+            <Setting />
+          </ProtectPage>
+        ),
       },
       {
         path: "/profile",
-        element: <MyProfile />,
+        element: (
+          <ProtectPage>
+            <MyProfile />
+          </ProtectPage>
+        ),
       },
     ],
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <AdminRoute>
+        <DashboardLayout />
+      </AdminRoute>
+    ),
     children: [
       {
         path: "",
@@ -74,6 +91,10 @@ const router = createBrowserRouter([
       {
         path: "Manage-User",
         element: <ManageUser />,
+      },
+      {
+        path: "Manage-Orders",
+        element: <ManageOrders />,
       },
     ],
   },
